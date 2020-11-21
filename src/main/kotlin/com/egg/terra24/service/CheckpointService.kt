@@ -27,7 +27,7 @@ class CheckpointServiceImpl(
         return request.leafTemplateIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
             val parentOptional = checkpointRepository.findById(request.parentCheckpointID)
             var parent: Checkpoint? = null
-            if (parentOptional.isPresent && !parentOptional.isEmpty) {
+            if (parentOptional.isPresent) {
                 parent = parentOptional.get()
             }
 
@@ -45,7 +45,7 @@ class CheckpointServiceImpl(
     override fun deleteCheckpoint(id: String) = checkpointRepository.deleteById(id)
     override fun editCheckpoint(checkpointID: String, edit: EditCheckpointRequestBody) {
         val checkpointOptional = checkpointRepository.findById(checkpointID)
-        if (checkpointOptional.isPresent && !checkpointOptional.isEmpty) {
+        if (checkpointOptional.isPresent) {
             val checkpoint = checkpointOptional.get()
             edit.description?.let { checkpoint.description = it }
             edit.title?.let { checkpoint.title = it }

@@ -3,7 +3,9 @@ package com.egg.terra24.data.entities
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.Table
 
+@Table
 @Entity
 class CheckpointResponse(
         @Id
