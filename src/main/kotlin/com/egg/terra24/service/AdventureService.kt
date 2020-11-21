@@ -26,14 +26,14 @@ class AdventureServiceImpl(
     private val profileService = ProfileServiceImpl(profileRepo)
     override fun getAdventure(id: String): Adventure?
             = adventureRepository.findById(id)
-            .takeIf { it.isPresent && !it.isEmpty }?.get()
+            .takeIf { it.isPresent }?.get()
 
     override fun getAdventures(): List<Adventure> = adventureRepository.findAll()
 
     override fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure? {
         val adventureOptional = adventureRepository.findById(adventureId)
         val userProfile = profileService.getProfile(userId)
-        if (!adventureOptional.isEmpty && adventureOptional.isPresent) {
+        if (adventureOptional.isPresent) {
             val adventure = adventureOptional.get()
             edit.addRoots?.let {templates ->
                 checkpointTemplateRepository.saveAll(templates)

@@ -12,7 +12,7 @@ class ProfileServiceImpl(
 ): ProfileService {
     override fun getProfile(id: String): Profile? {
         val profileOptional = profileRepository.findById(id)
-        return if (profileOptional.isPresent && !profileOptional.isEmpty) {
+        return if (profileOptional.isPresent) {
             profileOptional.get()
         } else {
             null
