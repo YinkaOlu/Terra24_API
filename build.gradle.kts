@@ -13,19 +13,25 @@ version = "0.0.2-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
+	jcenter()
 	mavenCentral()
 }
 
 dependencies {
+	implementation("com.google.appengine:appengine-api-1.0-sdk")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+	implementation("org.springframework.cloud:spring-cloud-gcp-starter")
+	implementation("org.springframework.cloud:spring-cloud-gcp-starter-sql-postgresql")
+	implementation("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
+
 
 tasks.withType<Test> {
 	useJUnitPlatform()
