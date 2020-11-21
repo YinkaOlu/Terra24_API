@@ -5,8 +5,9 @@ import java.util.*
 import javax.persistence.Entity;
 import javax.persistence.Id
 import javax.persistence.OneToMany
+import javax.persistence.Table
 
-
+@Table
 @Entity
 data class Adventure(
         var title: String,

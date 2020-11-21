@@ -11,7 +11,7 @@ import com.egg.terra24.data.repository.ProfileRepository
 
 interface AdventureService {
     fun getAdventure(id:String): Adventure?
-    fun getAdventures(): List<Adventure>
+    fun getAdventures(): MutableIterable<Adventure>
     fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure?
     fun deleteAdventure(id: String)
     fun createAdventure(create: NewAdventureRequestBody, userID: String): Adventure
@@ -28,7 +28,7 @@ class AdventureServiceImpl(
             = adventureRepository.findById(id)
             .takeIf { it.isPresent }?.get()
 
-    override fun getAdventures(): List<Adventure> = adventureRepository.findAll()
+    override fun getAdventures(): MutableIterable<Adventure> = adventureRepository.findAll()
 
     override fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure? {
         val adventureOptional = adventureRepository.findById(adventureId)

@@ -3,6 +3,7 @@ package com.egg.terra24.data.entities
 import java.util.*
 import javax.persistence.*
 
+@Table
 @Entity
 data class CheckpointTemplate (
         @Id

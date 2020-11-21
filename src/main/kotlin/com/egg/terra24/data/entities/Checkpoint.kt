@@ -2,11 +2,9 @@ package com.egg.terra24.data.entities
 
 import com.egg.terra24.data.type.UserResponse
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
+import javax.persistence.*
 
+@Table
 @Entity
 data class Checkpoint(
         @OneToOne

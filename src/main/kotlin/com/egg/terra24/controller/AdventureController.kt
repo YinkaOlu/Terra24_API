@@ -38,7 +38,7 @@ class AdventureController(
     fun deleteAdventure(@RequestParam(name = "adventureID", defaultValue = "") id: String): Unit = adventureService.deleteAdventure(id)
 
     @GetMapping("/adventures")
-    fun getAll(): List<Adventure> = adventureService.getAdventures()
+    fun getAll(): Iterable<Adventure> = adventureService.getAdventures()
 
     @PostMapping("/adventures")
     fun createAdventure(
