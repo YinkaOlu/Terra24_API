@@ -29,7 +29,6 @@ dependencies {
 	implementation("com.zaxxer:HikariCP:3.4.5")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc:1.2.6.RELEASE")
 	implementation("org.projectlombok:lombok")
-	implementation("com.zaxxer:HikariCP:2.5.1")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
