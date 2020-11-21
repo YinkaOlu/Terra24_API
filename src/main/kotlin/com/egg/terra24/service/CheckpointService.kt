@@ -1,64 +1,54 @@
 package com.egg.terra24.service
 
+import com.egg.terra24.data.entities.Checkpoint
+import com.egg.terra24.data.entities.CheckpointTemplate
+import com.egg.terra24.data.entities.request.checkpoint.ConnectCheckpointRequestBody
+import com.egg.terra24.data.entities.request.checkpoint.EditCheckpointRequestBody
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
+import com.egg.terra24.data.repository.ProfileRepository
 
 interface CheckpointService {
-    fun editTemplate(templateId: String)
-    fun deleteTempate(templateId: String)
-    fun getTemplate(templateID: String)
-    fun getTemplates()
-    fun createTemplate()
+    fun deleteTemplate(templateId: String)
+    fun saveTemplate(template: CheckpointTemplate): CheckpointTemplate
 
-    fun getCheckpoint(id: String)
-    fun editCheckpoint(id: String)
+    fun connect(request: ConnectCheckpointRequestBody): Checkpoint?
     fun deleteCheckpoint(id: String)
-    fun getCheckpoints()
-    fun createCheckpoint(templateId: String)
+    fun editCheckpoint(id: String, edit: EditCheckpointRequestBody)
 }
 
 class CheckpointServiceImpl(
-        templateRepository: CheckpointTemplateRepository,
-        checkpointRepository: CheckpointRepository
+        private val templateRepository: CheckpointTemplateRepository,
+        private val checkpointRepository: CheckpointRepository
 ): CheckpointService {
-    override fun editTemplate(templateId: String) {
-        TODO("Not yet implemented")
-    }
+    override fun deleteTemplate(templateId: String) = templateRepository.deleteById(templateId)
+    override fun saveTemplate(template: CheckpointTemplate) = templateRepository.save(template)
+    override fun connect(request: ConnectCheckpointRequestBody): Checkpoint? {
+        return request.leafTemplateIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
+            val parentOptional = checkpointRepository.findById(request.parentCheckpointID)
+            var parent: Checkpoint? = null
+            if (parentOptional.isPresent && !parentOptional.isEmpty) {
+                parent = parentOptional.get()
+            }
 
-    override fun deleteTempate(templateId: String) {
-        TODO("Not yet implemented")
+            val templates = templateRepository.findAllById(templateIDs)
+            val checkpoints = templates.map {
+                it.toCheckpoint(user = parent?.user)
+            }
+            checkpointRepository.saveAll(checkpoints)
+            parent?.apply {
+                children.addAll(checkpoints)
+            }
+            return@let parent
+        }
     }
-
-    override fun getTemplate(templateID: String) {
-        TODO("Not yet implemented")
+    override fun deleteCheckpoint(id: String) = checkpointRepository.deleteById(id)
+    override fun editCheckpoint(checkpointID: String, edit: EditCheckpointRequestBody) {
+        val checkpointOptional = checkpointRepository.findById(checkpointID)
+        if (checkpointOptional.isPresent && !checkpointOptional.isEmpty) {
+            val checkpoint = checkpointOptional.get()
+            edit.description?.let { checkpoint.description = it }
+            edit.title?.let { checkpoint.title = it }
+        }
     }
-
-    override fun getTemplates() {
-        TODO("Not yet implemented")
-    }
-
-    override fun createTemplate() {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCheckpoint(id: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun editCheckpoint(id: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteCheckpoint(id: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCheckpoints() {
-        TODO("Not yet implemented")
-    }
-
-    override fun createCheckpoint(templateId: String) {
-        TODO("Not yet implemented")
-    }
-
 }

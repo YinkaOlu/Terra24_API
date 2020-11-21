@@ -12,10 +12,12 @@ data class CheckpointTemplate (
         var title: String,
         var description: String,
         val created: Date = Date(),
+        val authorUserId: String = "internal"
 ) {
-        fun toCheckpoint(parent: Checkpoint? = null, children: List<Checkpoint>? = null): Checkpoint = Checkpoint(
+        fun toCheckpoint(parent: Checkpoint? = null, children: List<Checkpoint>? = null, user: Profile? = null): Checkpoint = Checkpoint(
                 template = this,
                 parent = parent,
-                children = children?.toMutableList() ?: mutableListOf()
+                children = children?.toMutableList() ?: mutableListOf(),
+                user = user
         )
 }
