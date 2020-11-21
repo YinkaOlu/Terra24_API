@@ -7,11 +7,12 @@ import com.egg.terra24.data.entities.request.adventure.NewAdventureRequestBody
 import com.egg.terra24.data.repository.AdventureRepository
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
+import com.egg.terra24.data.repository.ProfileRepository
 
 interface AdventureService {
     fun getAdventure(id:String): Adventure?
     fun getAdventures(): List<Adventure>
-    fun editAdventure(id: String, edit: EditAdventureRequestBody): Adventure?
+    fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure?
     fun deleteAdventure(id: String)
     fun createAdventure(create: NewAdventureRequestBody, userID: String): Adventure
 }
@@ -19,21 +20,24 @@ interface AdventureService {
 class AdventureServiceImpl(
         private val adventureRepository: AdventureRepository,
         private val checkpointTemplateRepository: CheckpointTemplateRepository,
-        private val checkpointRepository: CheckpointRepository
+        private val checkpointRepository: CheckpointRepository,
+        profileRepo: ProfileRepository
 ): AdventureService {
+    private val profileService = ProfileServiceImpl(profileRepo)
     override fun getAdventure(id: String): Adventure?
             = adventureRepository.findById(id)
             .takeIf { it.isPresent && !it.isEmpty }?.get()
 
     override fun getAdventures(): List<Adventure> = adventureRepository.findAll()
 
-    override fun editAdventure(id: String, edit: EditAdventureRequestBody): Adventure? {
-        val adventureOptional = adventureRepository.findById(id)
+    override fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure? {
+        val adventureOptional = adventureRepository.findById(adventureId)
+        val userProfile = profileService.getProfile(userId)
         if (!adventureOptional.isEmpty && adventureOptional.isPresent) {
             val adventure = adventureOptional.get()
             edit.addRoots?.let {templates ->
                 checkpointTemplateRepository.saveAll(templates)
-                val checkpoints = templates.map { it.toCheckpoint() }
+                val checkpoints = templates.map { it.toCheckpoint(user = userProfile) }
                 checkpointRepository.saveAll(checkpoints)
                 adventure.rootCheckpoints.addAll(checkpoints)
             }
@@ -54,17 +58,18 @@ class AdventureServiceImpl(
     override fun deleteAdventure(id: String): Unit = adventureRepository.deleteById(id)
     override fun createAdventure(create: NewAdventureRequestBody, userID: String): Adventure {
         var checkpoints: MutableList<Checkpoint> = mutableListOf()
+        val userProfile = profileService.getProfile(userID)
         create.rootCheckpointIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
             val templates = checkpointTemplateRepository.findAllById(templateIDs)
             checkpoints = templates.map {
-                it.toCheckpoint()
+                it.toCheckpoint(user= userProfile)
             }.toMutableList()
             checkpointRepository.saveAll(checkpoints)
         }
         create.rootCheckpointIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
             val templates = checkpointTemplateRepository.findAllById(templateIDs)
             checkpoints.addAll(templates.map {
-                it.toCheckpoint()
+                it.toCheckpoint(user= userProfile)
             })
             checkpointRepository.saveAll(checkpoints)
         }
@@ -72,7 +77,7 @@ class AdventureServiceImpl(
         create.checkpointTemplates.takeIf { it.isNotEmpty() }?.let { templates ->
             checkpointTemplateRepository.saveAll(templates)
             checkpoints.addAll(templates.map {
-                it.toCheckpoint()
+                it.toCheckpoint(user= userProfile)
             })
             checkpointRepository.saveAll(checkpoints)
         }

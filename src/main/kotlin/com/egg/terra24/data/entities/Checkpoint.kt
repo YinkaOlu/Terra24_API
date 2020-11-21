@@ -17,4 +17,23 @@ data class Checkpoint(
         var children: MutableList<Checkpoint> = mutableListOf(),
         @OneToOne
         var parent: Checkpoint? = null,
-)
+        @OneToOne
+        var user: Profile? = null,
+        @OneToMany
+        var responses: MutableList<CheckpointResponse> = mutableListOf()
+) {
+        private var overrideDescription: String? = null
+        private var overrideTitle: String? = null
+
+        var description: String
+                get() = overrideDescription ?: template.description
+                set(value) {
+                        overrideDescription = value
+                }
+
+        var title: String
+                get() = overrideTitle ?: template.description
+                set(value) {
+                        overrideTitle = value
+                }
+}
