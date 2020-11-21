@@ -2,12 +2,15 @@ package com.egg.terra24.service
 
 import com.egg.terra24.data.entities.Adventure
 import com.egg.terra24.data.entities.Checkpoint
+import com.egg.terra24.data.entities.CheckpointTemplate
 import com.egg.terra24.data.entities.request.adventure.EditAdventureRequestBody
 import com.egg.terra24.data.entities.request.adventure.NewAdventureRequestBody
 import com.egg.terra24.data.repository.AdventureRepository
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
 import com.egg.terra24.data.repository.ProfileRepository
+import javax.xml.transform.Templates
+import kotlin.math.pow
 
 interface AdventureService {
     fun getAdventure(id:String): Adventure?
@@ -15,6 +18,7 @@ interface AdventureService {
     fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure?
     fun deleteAdventure(id: String)
     fun createAdventure(create: NewAdventureRequestBody, userID: String): Adventure
+    fun generateAdventure(): Adventure
 }
 
 class AdventureServiceImpl(
@@ -90,4 +94,67 @@ class AdventureServiceImpl(
         adventureRepository.save(adv)
         return adv
     }
+
+    override fun generateAdventure(): Adventure {
+        val templates = checkpointTemplateRepository.findAll().toTypedArray()
+        val adv = Adventure("Eggcelent Adventures", "aut0generated")
+        templates.shuffle()
+        var level = 1.0
+
+        var remainderExists = true
+        var previousCheckpoints: MutableList<Checkpoint>? = null
+        var remaindingTemplates: Array<CheckpointTemplate>? = arrayOf()
+        do {
+            val maxParents = (3.0).pow(level - 1)
+            var levelResults:LevelResult? = null
+            if (level <= 1) {
+                levelResults = getLevelCheckpoints(level, templates)
+                if (levelResults == null) remainderExists = false
+                adv.rootCheckpoints = levelResults?.first ?: mutableListOf()
+            } else {
+                levelResults = getLevelCheckpoints(level, remaindingTemplates)
+                if (levelResults == null) remainderExists = false
+                processResults(levelResults, maxParents, previousCheckpoints)
+//                levelResults?.first?.let { adv.rootCheckpoints = it }
+            }
+            previousCheckpoints = levelResults?.first
+            remaindingTemplates = levelResults?.second?.toTypedArray()
+            level++
+        } while (remainderExists)
+
+        return adv
+    }
+
+    private fun processResults(levelResults: LevelResult?, maxParents: Double, previousCheckpoints: MutableList<Checkpoint>?) {
+        if (maxParents < 2) return
+        levelResults?.first?.forEachIndexed { index, checkPoint ->
+            val parentIndex = index.rem(maxParents)
+            previousCheckpoints?.get(parentIndex.toInt())?.let {
+                it.children.add(checkPoint)
+            }
+        }
+    }
+
+    private fun getLevelCheckpoints(level: Double, templates: Array<CheckpointTemplate>?): LevelResult?  {
+        if (templates == null) return null
+        val maxCheckpoints = 3.0.pow(level)
+        var checkPointsInLevel: LevelResult? = null
+        return if (templates.isNotEmpty()) {
+            val limit = if (templates.size > maxCheckpoints) maxCheckpoints else (templates.size - 1).toDouble()
+            checkPointsInLevel = LevelResult(mutableListOf(), mutableListOf())
+            for(templateIndex in 0 until limit.toInt()) {
+                checkPointsInLevel.first.add(templates[templateIndex].toCheckpoint())
+            }
+            if (templates.size > maxCheckpoints) {
+                checkPointsInLevel.second
+                        .addAll(templates.sliceArray(maxCheckpoints.toInt() until templates.size))
+            }
+            checkPointsInLevel
+        }
+        else {
+            checkPointsInLevel
+        }
+    }
 }
+
+typealias LevelResult = Pair<MutableList<Checkpoint>, MutableList<CheckpointTemplate>>

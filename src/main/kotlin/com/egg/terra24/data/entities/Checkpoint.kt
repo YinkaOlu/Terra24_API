@@ -16,8 +16,6 @@ data class Checkpoint(
         @OneToMany
         var children: MutableList<Checkpoint> = mutableListOf(),
         @OneToOne
-        var parent: Checkpoint? = null,
-        @OneToOne
         var user: Profile? = null,
         @OneToMany
         var responses: MutableList<CheckpointResponse> = mutableListOf()

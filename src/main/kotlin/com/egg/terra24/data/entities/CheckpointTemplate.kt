@@ -16,7 +16,6 @@ data class CheckpointTemplate (
 ) {
         fun toCheckpoint(parent: Checkpoint? = null, children: List<Checkpoint>? = null, user: Profile? = null): Checkpoint = Checkpoint(
                 template = this,
-                parent = parent,
                 children = children?.toMutableList() ?: mutableListOf(),
                 user = user
         )
