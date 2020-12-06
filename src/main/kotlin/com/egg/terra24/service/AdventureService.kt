@@ -9,7 +9,6 @@ import com.egg.terra24.data.repository.AdventureRepository
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
 import com.egg.terra24.data.repository.ProfileRepository
-import javax.xml.transform.Templates
 import kotlin.math.pow
 
 interface AdventureService {
@@ -17,8 +16,7 @@ interface AdventureService {
     fun getAdventures(): List<Adventure>
     fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure?
     fun deleteAdventure(id: String)
-    fun createAdventure(create: NewAdventureRequestBody, userID: String): Adventure
-    fun generateAdventure(): Adventure
+    fun generateAdventure(body: NewAdventureRequestBody, userID: String = ""): Adventure
 }
 
 class AdventureServiceImpl(
@@ -60,69 +58,34 @@ class AdventureServiceImpl(
     }
 
     override fun deleteAdventure(id: String): Unit = adventureRepository.deleteById(id)
-    override fun createAdventure(create: NewAdventureRequestBody, userID: String): Adventure {
-        var checkpoints: MutableList<Checkpoint> = mutableListOf()
-        val userProfile = profileService.getProfile(userID)
-        create.rootCheckpointIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
-            val templates = checkpointTemplateRepository.findAllById(templateIDs)
-            checkpoints = templates.map {
-                it.toCheckpoint(user= userProfile)
-            }.toMutableList()
-            checkpointRepository.saveAll(checkpoints)
-        }
-        create.rootCheckpointIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
-            val templates = checkpointTemplateRepository.findAllById(templateIDs)
-            checkpoints.addAll(templates.map {
-                it.toCheckpoint(user= userProfile)
-            })
-            checkpointRepository.saveAll(checkpoints)
-        }
 
-        create.checkpointTemplates.takeIf { it.isNotEmpty() }?.let { templates ->
-            checkpointTemplateRepository.saveAll(templates)
-            checkpoints.addAll(templates.map {
-                it.toCheckpoint(user= userProfile)
-            })
-            checkpointRepository.saveAll(checkpoints)
-        }
-        val adv = Adventure(
-                title = create.title,
-                description = create.description,
-                rootCheckpoints = checkpoints,
-                authorID = userID
-        )
-        adventureRepository.save(adv)
-        return adv
-    }
-
-    override fun generateAdventure(): Adventure {
+    override fun generateAdventure(body: NewAdventureRequestBody, userID: String): Adventure {
         val templates = checkpointTemplateRepository.findAll().toTypedArray()
-        val adv = Adventure("Eggcelent Adventures", "aut0generated")
+        val adv = Adventure(body.title, body.description, authorID = userID)
         templates.shuffle()
         var level = 1.0
-        val maxLevels = 3.0
+        val maxLevels = body.levels
 
         var remainderExists = true
         var previousCheckpoints: MutableList<Checkpoint>? = null
-        var remaindingTemplates: Array<CheckpointTemplate>? = arrayOf()
+        var remainingTemplates: Array<CheckpointTemplate>? = arrayOf()
         do {
             var levelResults:LevelResult? = null
             if (level > 1) {
-                levelResults = getLevelCheckpoints(level, remaindingTemplates)
+                levelResults = getLevelCheckpoints(level, remainingTemplates)
                 if (levelResults == null) remainderExists = false
                 processResults(levelResults, level, previousCheckpoints)
             } else {
                 levelResults = getLevelCheckpoints(level, templates)
                 if (levelResults == null) remainderExists = false
                 adv.rootCheckpoints = levelResults?.first ?: mutableListOf()
-//                levelResults?.first?.let { adv.rootCheckpoints = it }
             }
             levelResults?.first?.let {
                 previousCheckpoints = it
                 checkpointRepository.saveAll(it)
             }
 
-            remaindingTemplates = levelResults?.second?.toTypedArray()
+            remainingTemplates = levelResults?.second?.toTypedArray()
             level++
             if (level > maxLevels) break
         } while (remainderExists)
@@ -136,7 +99,7 @@ class AdventureServiceImpl(
         levelResults?.first?.forEachIndexed { index, checkPoint ->
             val parentIndex = index.rem(maxParents)
             previousCheckpoints?.get(parentIndex.toInt())?.let {
-                it.children.add(checkPoint)
+                it.next.add(checkPoint)
             }
         }
     }

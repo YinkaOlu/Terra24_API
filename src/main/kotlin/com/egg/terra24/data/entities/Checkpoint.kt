@@ -14,7 +14,7 @@ data class Checkpoint(
         @Id
         val id: String = UUID.randomUUID().toString(),
         @OneToMany
-        var children: MutableList<Checkpoint> = mutableListOf(),
+        var next: MutableList<Checkpoint> = mutableListOf(),
         @OneToOne
         var user: Profile? = null,
         @OneToMany
