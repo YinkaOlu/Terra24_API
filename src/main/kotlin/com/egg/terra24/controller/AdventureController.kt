@@ -46,6 +46,6 @@ class AdventureController(
             @RequestHeader("UserID") userID: String
     ): Adventure? = adventureService.createAdventure(body, userID)
 
-    @PostMapping("/adventure/auto/generate")
+    @PostMapping("/adventure/random")
     fun generate(): Adventure? = adventureService.generateAdventure()
 }
