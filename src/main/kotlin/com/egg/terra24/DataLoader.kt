@@ -13,7 +13,13 @@ class DataLoader(
     override fun run(args: ApplicationArguments?) {
         val templates = mutableListOf<CheckpointTemplate>()
         repeat(100) {
-            templates.add(CheckpointTemplate(title = "Test$it", description = "test_$it"))
+            templates.add(
+                CheckpointTemplate(
+                    title = "Test$it",
+                    description = "test_$it",
+                    tags = mutableListOf("generic")
+                )
+            )
         }
         checkpointTemplateRepository.saveAll(templates)
     }

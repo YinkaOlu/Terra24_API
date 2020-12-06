@@ -6,7 +6,6 @@ import com.egg.terra24.data.entities.request.checkpoint.ConnectCheckpointRequest
 import com.egg.terra24.data.entities.request.checkpoint.EditCheckpointRequestBody
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
-import com.egg.terra24.data.repository.ProfileRepository
 
 interface CheckpointService {
     fun deleteTemplate(templateId: String)
@@ -37,7 +36,7 @@ class CheckpointServiceImpl(
             }
             checkpointRepository.saveAll(checkpoints)
             parent?.apply {
-                children.addAll(checkpoints)
+                next.addAll(checkpoints)
             }
             return@let parent
         }
