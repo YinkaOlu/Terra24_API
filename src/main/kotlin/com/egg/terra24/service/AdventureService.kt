@@ -100,33 +100,39 @@ class AdventureServiceImpl(
         val adv = Adventure("Eggcelent Adventures", "aut0generated")
         templates.shuffle()
         var level = 1.0
+        val maxLevels = 3.0
 
         var remainderExists = true
         var previousCheckpoints: MutableList<Checkpoint>? = null
         var remaindingTemplates: Array<CheckpointTemplate>? = arrayOf()
         do {
-            val maxParents = (3.0).pow(level - 1)
             var levelResults:LevelResult? = null
-            if (level <= 1) {
+            if (level > 1) {
+                levelResults = getLevelCheckpoints(level, remaindingTemplates)
+                if (levelResults == null) remainderExists = false
+                processResults(levelResults, level, previousCheckpoints)
+            } else {
                 levelResults = getLevelCheckpoints(level, templates)
                 if (levelResults == null) remainderExists = false
                 adv.rootCheckpoints = levelResults?.first ?: mutableListOf()
-            } else {
-                levelResults = getLevelCheckpoints(level, remaindingTemplates)
-                if (levelResults == null) remainderExists = false
-                processResults(levelResults, maxParents, previousCheckpoints)
 //                levelResults?.first?.let { adv.rootCheckpoints = it }
             }
-            previousCheckpoints = levelResults?.first
+            levelResults?.first?.let {
+                previousCheckpoints = it
+                checkpointRepository.saveAll(it)
+            }
+
             remaindingTemplates = levelResults?.second?.toTypedArray()
             level++
+            if (level > maxLevels) break
         } while (remainderExists)
 
+        adventureRepository.save(adv)
         return adv
     }
 
-    private fun processResults(levelResults: LevelResult?, maxParents: Double, previousCheckpoints: MutableList<Checkpoint>?) {
-        if (maxParents < 2) return
+    private fun processResults(levelResults: LevelResult?, level: Double, previousCheckpoints: MutableList<Checkpoint>?) {
+        val maxParents = (3.0).pow(level - 1)
         levelResults?.first?.forEachIndexed { index, checkPoint ->
             val parentIndex = index.rem(maxParents)
             previousCheckpoints?.get(parentIndex.toInt())?.let {
