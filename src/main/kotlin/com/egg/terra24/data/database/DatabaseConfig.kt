@@ -11,10 +11,19 @@ import javax.sql.DataSource
 class DatabaseConfig {
     @Value("\${spring.datasource.url}")
     private val dbUrl: String? = null
+
+    @Value("\${spring.datasource.password}")
+    private val dbPassword: String? = null
+
+    @Value("\${spring.datasource.username}")
+    private val dbUserName: String? = null
+
     @Bean
     fun dataSource(): DataSource {
         val config = HikariConfig()
         config.jdbcUrl = dbUrl
+        config.password = dbPassword
+        config.username = dbUserName
         return HikariDataSource(config)
     }
 }
