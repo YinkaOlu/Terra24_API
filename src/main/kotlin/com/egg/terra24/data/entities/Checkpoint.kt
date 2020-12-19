@@ -2,17 +2,15 @@ package com.egg.terra24.data.entities
 
 import com.egg.terra24.data.type.UserResponse
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
+import javax.persistence.*
 
 @Entity
 data class Checkpoint(
+        @Id
+        @GeneratedValue
+        val id: Long? = null,
         @OneToOne
         val template: CheckpointTemplate,
-        @Id
-        val id: String = UUID.randomUUID().toString(),
         @OneToMany
         var next: MutableList<Checkpoint> = mutableListOf(),
         @OneToOne

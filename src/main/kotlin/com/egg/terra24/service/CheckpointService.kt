@@ -4,50 +4,37 @@ import com.egg.terra24.data.entities.Checkpoint
 import com.egg.terra24.data.entities.CheckpointTemplate
 import com.egg.terra24.data.entities.request.checkpoint.ConnectCheckpointRequestBody
 import com.egg.terra24.data.entities.request.checkpoint.EditCheckpointRequestBody
+import com.egg.terra24.data.entities.request.checkpoint.template.EditCheckpointTemplateBody
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import java.util.*
 
 interface CheckpointService {
     fun deleteTemplate(templateId: String)
+    fun nukeTemplates()
     fun saveTemplate(template: CheckpointTemplate): CheckpointTemplate
-
-    fun connect(request: ConnectCheckpointRequestBody): Checkpoint?
-    fun deleteCheckpoint(id: String)
-    fun editCheckpoint(id: String, edit: EditCheckpointRequestBody)
+    fun editTemplate(templateId: String, editDetails: EditCheckpointTemplateBody): CheckpointTemplate
+    fun getTemplate(templateId: String): CheckpointTemplate?
+    fun getTemplates(pageNumber: Int = 0, pageSize:Int = 1): Page<CheckpointTemplate>
 }
 
 class CheckpointServiceImpl(
-        private val templateRepository: CheckpointTemplateRepository,
-        private val checkpointRepository: CheckpointRepository
+        private val templateRepository: CheckpointTemplateRepository
 ): CheckpointService {
     override fun deleteTemplate(templateId: String) = templateRepository.deleteById(templateId)
+    override fun nukeTemplates() = templateRepository.deleteAll()
     override fun saveTemplate(template: CheckpointTemplate) = templateRepository.save(template)
-    override fun connect(request: ConnectCheckpointRequestBody): Checkpoint? {
-        return request.leafTemplateIDs.takeIf { it.isNotEmpty() }?.let { templateIDs ->
-            val parentOptional = checkpointRepository.findById(request.parentCheckpointID)
-            var parent: Checkpoint? = null
-            if (parentOptional.isPresent && !parentOptional.isEmpty) {
-                parent = parentOptional.get()
-            }
-
-            val templates = templateRepository.findAllById(templateIDs)
-            val checkpoints = templates.map {
-                it.toCheckpoint(user = parent?.user)
-            }
-            checkpointRepository.saveAll(checkpoints)
-            parent?.apply {
-                next.addAll(checkpoints)
-            }
-            return@let parent
-        }
+    override fun editTemplate(templateId: String, editDetails: EditCheckpointTemplateBody): CheckpointTemplate {
+        val template = templateRepository.getOne(templateId)
+        editDetails.addTags?.let { template.tags.addAll(it) }
+        editDetails.removeTags?.let { template.tags.removeAll(it) }
+        editDetails.description?.let { template.description = it }
+        editDetails.title?.let { template.title = it }
+        return templateRepository.save(template)
     }
-    override fun deleteCheckpoint(id: String) = checkpointRepository.deleteById(id)
-    override fun editCheckpoint(checkpointID: String, edit: EditCheckpointRequestBody) {
-        val checkpointOptional = checkpointRepository.findById(checkpointID)
-        if (checkpointOptional.isPresent && !checkpointOptional.isEmpty) {
-            val checkpoint = checkpointOptional.get()
-            edit.description?.let { checkpoint.description = it }
-            edit.title?.let { checkpoint.title = it }
-        }
-    }
+    override fun getTemplate(templateId: String): CheckpointTemplate? = templateRepository.findById(templateId).takeIf { it.isPresent && !it.isEmpty }?.get()
+    override fun getTemplates(pageNumber: Int, pageSize:Int): Page<CheckpointTemplate> = templateRepository.findAll(PageRequest.of(pageNumber, pageSize))
 }
