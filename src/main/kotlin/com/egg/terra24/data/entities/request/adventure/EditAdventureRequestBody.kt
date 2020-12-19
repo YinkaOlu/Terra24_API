@@ -6,6 +6,6 @@ class EditAdventureRequestBody(
         val title: String? = null,
         val description: String? = null,
         val addRoots: MutableList<CheckpointTemplate>? = mutableListOf(),
-        val removeRoots: MutableList<String>? = mutableListOf(),
+        val removeRoots: MutableList<Long>? = mutableListOf(),
 ) {
 }

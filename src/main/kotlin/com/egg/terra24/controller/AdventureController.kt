@@ -24,23 +24,16 @@ class AdventureController(
             checkpointRepository,
             profileRepository
     )
-    @GetMapping("$API_SUFFIX", params = ["adventureID"])
+    @GetMapping(API_SUFFIX, params = [ADVENTURE_PARAMETER_NAME])
     fun getAdventure(@RequestParam(name = "adventureID", defaultValue = "") id: String): Adventure? = adventureService.getAdventure(id)
 
-    @PutMapping("$API_SUFFIX", params = ["adventureID"])
-    fun editAdventure(
-            @RequestParam(name = "adventureID", defaultValue = "") adventureID: String,
-            @RequestBody body: EditAdventureRequestBody,
-            @RequestHeader("UserID") userID: String
-    ): Adventure? = adventureService.editAdventure(userID, adventureID, body)
+    @DeleteMapping(API_SUFFIX, params = [ADVENTURE_PARAMETER_NAME])
+    fun deleteAdventure(@RequestParam(name = ADVENTURE_PARAMETER_NAME, defaultValue = "") id: String): Unit = adventureService.deleteAdventure(id)
 
-    @DeleteMapping("$API_SUFFIX", params = ["adventureID"])
-    fun deleteAdventure(@RequestParam(name = "adventureID", defaultValue = "") id: String): Unit = adventureService.deleteAdventure(id)
-
-    @GetMapping("$API_SUFFIX")
+    @GetMapping(API_SUFFIX)
     fun getAll(): List<Adventure> = adventureService.getAdventures()
 
-    @PostMapping("$API_SUFFIX")
+    @PostMapping(API_SUFFIX)
     fun generate(
         @RequestBody body: NewAdventureRequestBody,
         @RequestHeader("UserID") userID: String
@@ -48,5 +41,6 @@ class AdventureController(
 
     companion object {
         const val API_SUFFIX = "/adventures"
+        const val ADVENTURE_PARAMETER_NAME = "adventureID"
     }
 }

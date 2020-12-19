@@ -5,7 +5,7 @@ import java.util.*
 import javax.persistence.Id
 
 
-class NewCheckpointTemplateRequest(
+data class NewCheckpointTemplateRequest(
         @Id
         val id: String = UUID.randomUUID().toString(),
         val parent: Checkpoint? = null,

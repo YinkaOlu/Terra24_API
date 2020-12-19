@@ -44,7 +44,7 @@ class AdventureServiceImpl(
                 adventure.rootCheckpoints.addAll(checkpoints)
             }
             edit.removeRoots?.let { rootsToRemove ->
-                adventure.rootCheckpoints.removeIf {template ->
+                adventure.rootCheckpoints.removeIf { template ->
                     rootsToRemove.find { it == template.id } != null
                 }
             }
@@ -61,7 +61,7 @@ class AdventureServiceImpl(
 
     override fun generateAdventure(body: NewAdventureRequestBody, userID: String): Adventure {
         val templates = checkpointTemplateRepository.findAll().toTypedArray()
-        val adv = Adventure(body.title, body.description, authorID = userID)
+        val adv = Adventure(title = body.title, description = body.description, authorID = userID)
         templates.shuffle()
         var level = 1.0
         val maxLevels = body.levels
