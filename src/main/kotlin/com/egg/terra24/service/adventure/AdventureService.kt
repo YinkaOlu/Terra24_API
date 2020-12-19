@@ -5,12 +5,6 @@ import com.egg.terra24.data.entities.Checkpoint
 import com.egg.terra24.data.entities.CheckpointTemplate
 import com.egg.terra24.data.entities.request.adventure.EditAdventureRequestBody
 import com.egg.terra24.data.entities.request.adventure.NewAdventureRequestBody
-import com.egg.terra24.data.repository.AdventureRepository
-import com.egg.terra24.data.repository.CheckpointRepository
-import com.egg.terra24.data.repository.CheckpointTemplateRepository
-import com.egg.terra24.data.repository.ProfileRepository
-import com.egg.terra24.service.ProfileServiceImpl
-import kotlin.math.pow
 
 interface AdventureService {
     fun getAdventure(id:String): Adventure?
