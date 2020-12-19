@@ -6,7 +6,8 @@ import javax.persistence.*
 @Entity
 data class CheckpointTemplate (
         @Id
-        var id: String = UUID.randomUUID().toString(),
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        val id: Long = -1,
         @ElementCollection
         var tags: MutableList<String> = mutableListOf(),
         var title: String,

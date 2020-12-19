@@ -1,14 +1,11 @@
-package com.egg.terra24.service
+package com.egg.terra24.service.profile
 
 import com.egg.terra24.data.entities.Profile
 import com.egg.terra24.data.repository.ProfileRepository
-
-interface ProfileService {
-    fun getProfile(id: String): Profile?
-}
+import com.egg.terra24.service.ProfileService
 
 class ProfileServiceImpl(
-        private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository
 ): ProfileService {
     override fun getProfile(id: String): Profile? {
         val profileOptional = profileRepository.findById(id)
