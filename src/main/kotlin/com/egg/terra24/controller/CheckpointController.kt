@@ -2,13 +2,9 @@ package com.egg.terra24.controller
 
 import com.egg.terra24.controller.type.BaseController
 import com.egg.terra24.data.entities.CheckpointTemplate
-import com.egg.terra24.data.entities.request.checkpoint.ConnectCheckpointRequestBody
-import com.egg.terra24.data.entities.request.checkpoint.EditCheckpointRequestBody
 import com.egg.terra24.data.entities.request.checkpoint.template.EditCheckpointTemplateBody
-import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
-import com.egg.terra24.data.repository.ProfileRepository
-import com.egg.terra24.service.CheckpointServiceImpl
+import com.egg.terra24.service.checkpoint.CheckpointServiceImpl
 import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 

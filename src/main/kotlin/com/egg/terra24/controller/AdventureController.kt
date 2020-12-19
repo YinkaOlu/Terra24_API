@@ -2,13 +2,12 @@ package com.egg.terra24.controller
 
 import com.egg.terra24.controller.type.BaseController
 import com.egg.terra24.data.entities.Adventure
-import com.egg.terra24.data.entities.request.adventure.EditAdventureRequestBody
 import com.egg.terra24.data.entities.request.adventure.NewAdventureRequestBody
 import com.egg.terra24.data.repository.AdventureRepository
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
 import com.egg.terra24.data.repository.ProfileRepository
-import com.egg.terra24.service.AdventureServiceImpl
+import com.egg.terra24.service.adventure.AdventureServiceImpl
 import org.springframework.web.bind.annotation.*
 
 @RestController

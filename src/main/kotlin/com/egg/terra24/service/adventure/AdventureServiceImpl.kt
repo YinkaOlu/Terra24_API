@@ -1,4 +1,4 @@
-package com.egg.terra24.service
+package com.egg.terra24.service.adventure
 
 import com.egg.terra24.data.entities.Adventure
 import com.egg.terra24.data.entities.Checkpoint
@@ -9,26 +9,19 @@ import com.egg.terra24.data.repository.AdventureRepository
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
 import com.egg.terra24.data.repository.ProfileRepository
+import com.egg.terra24.service.ProfileServiceImpl
 import kotlin.math.pow
 
-interface AdventureService {
-    fun getAdventure(id:String): Adventure?
-    fun getAdventures(): List<Adventure>
-    fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure?
-    fun deleteAdventure(id: String)
-    fun generateAdventure(body: NewAdventureRequestBody, userID: String = ""): Adventure
-}
-
 class AdventureServiceImpl(
-        private val adventureRepository: AdventureRepository,
-        private val checkpointTemplateRepository: CheckpointTemplateRepository,
-        private val checkpointRepository: CheckpointRepository,
-        profileRepo: ProfileRepository
+    private val adventureRepository: AdventureRepository,
+    private val checkpointTemplateRepository: CheckpointTemplateRepository,
+    private val checkpointRepository: CheckpointRepository,
+    profileRepo: ProfileRepository
 ): AdventureService {
     private val profileService = ProfileServiceImpl(profileRepo)
     override fun getAdventure(id: String): Adventure?
             = adventureRepository.findById(id)
-            .takeIf { it.isPresent && !it.isEmpty }?.get()
+        .takeIf { it.isPresent && !it.isEmpty }?.get()
 
     override fun getAdventures(): List<Adventure> = adventureRepository.findAll()
 
@@ -70,7 +63,7 @@ class AdventureServiceImpl(
         var previousCheckpoints: MutableList<Checkpoint>? = null
         var remainingTemplates: Array<CheckpointTemplate>? = arrayOf()
         do {
-            var levelResults:LevelResult? = null
+            var levelResults: LevelResult? = null
             if (level > 1) {
                 levelResults = getLevelCheckpoints(level, remainingTemplates)
                 if (levelResults == null) remainderExists = false
@@ -116,7 +109,7 @@ class AdventureServiceImpl(
             }
             if (templates.size > maxCheckpoints) {
                 checkPointsInLevel.second
-                        .addAll(templates.sliceArray(maxCheckpoints.toInt() until templates.size))
+                    .addAll(templates.sliceArray(maxCheckpoints.toInt() until templates.size))
             }
             checkPointsInLevel
         }
@@ -125,5 +118,3 @@ class AdventureServiceImpl(
         }
     }
 }
-
-typealias LevelResult = Pair<MutableList<Checkpoint>, MutableList<CheckpointTemplate>>
