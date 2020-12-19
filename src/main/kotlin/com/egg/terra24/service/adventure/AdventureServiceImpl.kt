@@ -9,7 +9,7 @@ import com.egg.terra24.data.repository.AdventureRepository
 import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
 import com.egg.terra24.data.repository.ProfileRepository
-import com.egg.terra24.service.ProfileServiceImpl
+import com.egg.terra24.service.profile.ProfileServiceImpl
 import kotlin.math.pow
 
 class AdventureServiceImpl(
