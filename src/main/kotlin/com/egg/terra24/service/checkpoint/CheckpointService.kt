@@ -7,10 +7,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 
 interface CheckpointService {
-    fun deleteTemplate(templateId: String)
     fun nukeTemplates()
     fun saveTemplate(template: CheckpointTemplate): CheckpointTemplate
-    fun editTemplate(templateId: String, editDetails: EditCheckpointTemplateBody): CheckpointTemplate
-    fun getTemplate(templateId: String): CheckpointTemplate?
-    fun getTemplates(pageNumber: Int = 0, pageSize:Int = 1): Page<CheckpointTemplate>
+    fun editTemplate(templateId: Long, editDetails: EditCheckpointTemplateBody): CheckpointTemplate?
+    fun getTemplate(templateId: Long): CheckpointTemplate?
+    fun getTemplates(pageNumber: Int = 0, pageSize:Int = 10): Page<CheckpointTemplate>
 }
