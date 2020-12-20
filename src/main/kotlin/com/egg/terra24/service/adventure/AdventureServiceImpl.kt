@@ -10,6 +10,9 @@ import com.egg.terra24.data.repository.CheckpointRepository
 import com.egg.terra24.data.repository.CheckpointTemplateRepository
 import com.egg.terra24.data.repository.ProfileRepository
 import com.egg.terra24.service.profile.ProfileServiceImpl
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import javax.transaction.Transactional
 import kotlin.math.pow
 
 class AdventureServiceImpl(
@@ -19,11 +22,12 @@ class AdventureServiceImpl(
     profileRepo: ProfileRepository
 ): AdventureService {
     private val profileService = ProfileServiceImpl(profileRepo)
-    override fun getAdventure(id: String): Adventure?
-            = adventureRepository.findById(id)
+    override fun getAdventure(id: Long): Adventure?
+            = adventureRepository.findAdventureById(id)
         .takeIf { it.isPresent && !it.isEmpty }?.get()
 
-    override fun getAdventures(): List<Adventure> = adventureRepository.findAll()
+    override fun getAdventures(pageNumber: Long, pageSize: Long): Page<Adventure>
+        = adventureRepository.findAll(PageRequest.of(pageNumber.toInt(), pageSize.toInt()))
 
     override fun editAdventure(userId: String, adventureId: String, edit: EditAdventureRequestBody): Adventure? {
         val adventureOptional = adventureRepository.findById(adventureId)
@@ -49,8 +53,6 @@ class AdventureServiceImpl(
             return null
         }
     }
-
-    override fun deleteAdventure(id: String): Unit = adventureRepository.deleteById(id)
 
     override fun generateAdventure(body: NewAdventureRequestBody, userID: String): Adventure {
         val templates = checkpointTemplateRepository.findAll().toTypedArray()

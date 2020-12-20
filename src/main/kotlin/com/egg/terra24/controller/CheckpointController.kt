@@ -21,32 +21,18 @@ class CheckpointController(
     @GetMapping("$ROOT_API_SUFFIX$TEMPLATE_API_SUFFIX")
     fun getTemplate(
         @RequestParam(name = TEMPLATE_ID_PARAMETER, defaultValue = "") templateID: String
-    ): CheckpointTemplate? = checkpointService.getTemplate(templateID)
+    ): CheckpointTemplate? = checkpointService.getTemplate(templateID.toLong())
 
     @GetMapping("$ROOT_API_SUFFIX$TEMPLATE_API_SUFFIX/all")
     fun getTemplates(
         @RequestParam(name = PAGE_PARAMETER, defaultValue = "0") pageValue: String
     ): Page<CheckpointTemplate> = checkpointService.getTemplates(pageValue.toInt())
 
-    @DeleteMapping("$ROOT_API_SUFFIX$TEMPLATE_API_SUFFIX", params = [TEMPLATE_ID_PARAMETER])
-    fun deleteTemplate(
-            @RequestParam(name = TEMPLATE_ID_PARAMETER, defaultValue = "") templateID: String
-    ): String {
-        checkpointService.deleteTemplate(templateID)
-        return "Checkpoint template deleted"
-    }
-
-    @DeleteMapping("$ROOT_API_SUFFIX$TEMPLATE_API_SUFFIX/all")
-    fun nukeTemplate(): String {
-        checkpointService.nukeTemplates()
-        return "Templates nuked"
-    }
-
     @PutMapping("$ROOT_API_SUFFIX$TEMPLATE_API_SUFFIX", params = [TEMPLATE_ID_PARAMETER])
     fun editTemplate(
         @RequestParam(name = TEMPLATE_ID_PARAMETER, defaultValue = "") templateID: String,
         @RequestBody body: EditCheckpointTemplateBody
-    ): CheckpointTemplate = checkpointService.editTemplate(templateID, body)
+    ): CheckpointTemplate? = checkpointService.editTemplate(templateID.toLong(), body)
 
     companion object {
         const val ROOT_API_SUFFIX = "/checkpoint"
